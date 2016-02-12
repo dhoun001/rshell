@@ -157,12 +157,27 @@ void run()
 	}
 }
 */
-//main function, will contain test cases
+//main function, will contain test cases 
+
+void startline()
+{ 
+    char hostname[128];
+    int hostnameStatus = gethostname(hostname, sizeof(hostname)); //passes in an array named hostname & it basically makes a copy of the hostname stored  
+                                                                  //somewhere else and passes it back by reference (default b/c its an array). 
+    if(hostnameStatus == -1) 
+    {
+        perror(hostname);           
+    }
+    else
+    {
+         char* login = getlogin();       
+         cout << login << "@" << hostname << " $ ";
+    }   
+}
 
 int main()
 {
-    int gethostname(char* name, size_t len);
-    int sethostname(const char* name, size_t len); 
+    startline(); 
 
 	string command = "ls -a && echo asdfkasdfjasdf ; echo asdfjjenenc || aasdfaf";
 	vector< vector<string> > cmdline;
