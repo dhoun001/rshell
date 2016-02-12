@@ -53,6 +53,7 @@ void parseconnect(vector< vector<string> > &cmd, vector<string> &connect, string
 			needff = 10000;
 		}
 
+		//checks to see which index of the different connectors are first
 		vector<string> temp;
 		if (semi > needf)
 		{
@@ -110,30 +111,27 @@ void parseconnect(vector< vector<string> > &cmd, vector<string> &connect, string
 }
 
 //tokenizer function
-void token(vector< vector<string> > &cmdl)
+void token(vector< vector<string> > cmdl, vector< vector<string> > &cmdl2)
 {
 	string f;
 	for (int i = 0; i < cmdl.size(); ++i)
 	{
 		int j = 0;
-		typedef tokenizer< char_separator<char> > tokenizer;
 		char_separator<char> sep(" ");
-		tokenizer tokens(cmdl.at(i).at(0), sep);
+		tokenizer< char_separator<char> > tok(cmdl.at(i).at(0), sep);
 		
-		for (int k = 0; k < cmdl.size(); ++k)
-		{
-			cout << "cmd before pop_back: " << cmdl.at(i).at(0) << endl;
-		}
+		cout << cmdl.at(i).at(0) << endl;
+		cmdl2.push_back(vector<string>());
 
-		cmdl.at(i).pop_back();
-
-		for (tokenizer::iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
+		//must seperate vectors or the tokenizer will BREAK
+		for (tokenizer< char_separator<char> >::iterator iter = tok.begin(); iter != tok.end(); ++iter)
 		{
 			cout << "deref iters: " << *iter << endl; 
 			f = *iter;
-			cmdl.at(i).push_back(f);
+			cmdl2.at(i).push_back(f);
 			++j;
 		}
+		
 	}
 }
 
@@ -182,21 +180,21 @@ void run()
 			{
 				cout << "cmd before tokenizing: " << cmdline.at(i).at(0) << endl;
 			}
-
-            token(cmdline); 
+			vector< vector<string> > cmdline2;
+            token(cmdline, cmdline2); 
             vector< vector<char*> > commands;
 
 			//changes all strings to char pointers
-			for (int i = 0; i < cmdline.size(); ++i)
+			for (int i = 0; i < cmdline2.size(); ++i)
 			{
 				//cout << cmdline.size() << endl;
 				commands.push_back( vector<char*>() );
-				for (int j = 0; j < cmdline.at(i).size(); ++j)
+				for (int j = 0; j < cmdline2.at(i).size(); ++j)
 				{
 					cout << endl;
-					cout << "before conversion to char*: " << cmdline.at(i).at(j) << endl;
-					cout << "during conversion to char*: " << cmdline.at(i).at(j).c_str() << endl;
-					commands.at(i).push_back(const_cast<char*>(cmdline.at(i).at(j).c_str()));
+					cout << "before conversion to char*: " << cmdline2.at(i).at(j) << endl;
+					cout << "during conversion to char*: " << cmdline2.at(i).at(j).c_str() << endl;
+					commands.at(i).push_back(const_cast<char*>(cmdline2.at(i).at(j).c_str()));
 				}
 				char* temp = NULL;
 				commands.at(i).push_back(temp);
@@ -233,13 +231,20 @@ void run()
 					{
 						if (connectors.at(i) == "&&")
 						{
-							sentinel == false;
+							sentinel = false;
 						}
 						else
 						{
 							sentinel == true;
 						}
 						perror("exec");
+					}
+					else
+					{
+						if (connectors.at(i) == "||")
+						{
+							sentinel = false;
+						}
 					}
 				}
 				if (pid > 0)
@@ -260,8 +265,9 @@ void run()
 int main()
 {
 	string command = "ls -a ; echo asdfkasdfjasdf ; echo asdfjjenenc || aasdfaf";
-	vector< vector<string> > cmdline;
 	vector<string> connectors;
+	vector< vector<string> > cmdline;
+	vector< vector<string> > cmdline2;
 	parseconnect(cmdline, connectors, command);
 	
 	for (int i = 0; i < cmdline.size() - 1; ++i)
@@ -273,12 +279,12 @@ int main()
 		}
 	}
 	cout << cmdline.at(cmdline.size() - 1).at(0) << endl;
-	token(cmdline);
-	for (int i = 0; i < cmdline.size(); ++i)
+	token(cmdline, cmdline2);
+	for (int i = 0; i < cmdline2.size(); ++i)
 	{
-		for (int j = 0; j < cmdline.at(i).size(); ++j)
+		for (int j = 0; j < cmdline2.at(i).size(); ++j)
 		{
-			cout << "<" << cmdline.at(i).at(j) << ">" << endl;
+			cout << "<" << cmdline2.at(i).at(j) << ">" << endl;
 		}
 	}
 
