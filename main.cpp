@@ -165,21 +165,64 @@ void run()
 		}
 		else
 		{
-			//call to parse
+		    //call to parse
 			vector< vector<string> > cmdline;
 			vector<string> connectors;
 			parseconnect(cmdline, connectors, command);
             token(cmdline); 
-            
-           //cmdline.size() add null at very end 
-           pid_t pid = fork(); 
-           sentinel = true; 
-           vector<char*> commandVec; 
-           
-           while(sentinel == true) 
+            vector< vector<char*> > commands; 
+
+            //changes all strings to char pointers
+            for(int i = 0; i < cmdline.size(); i++) 
            {
-                    
-           }       
+               commands.push_back(vector<char*>() ); 
+               for(int j = 0; j < cmdline.size(); j++)
+               {
+                   commands.at(i).push_back(const_cast<char*>(cmdline.at(i).at(j).c_str()));
+               } 
+                char* temp = NULL; 
+                commands.at(i).push_back(const_cast<char*>(temp)); 
+           }
+           //cmdline.size() add null at very end 
+
+           int i = 0; 
+           bool sentinel = true; 
+           while(sentinel == true)
+           {
+               //checks for connector logic
+               if(i >= connectors.size())
+               {
+                   sentinel = false; 
+               }
+               else if(connectors.at(i) == ";") 
+               {
+                   sentinel == true;
+               }
+               pid_t pid = fork();
+               if(pid == 0) 
+               {
+                   if(execvp(commands.at(i).at(0), &(commands.at(i).at(0))) == -1)
+                   {
+                       if(connectors.at(i) == "&&") 
+                       {
+                           sentinel == false; 
+                       }
+                       else
+                       {
+                           sentinel == true; 
+                       }
+                       perror("exec"); 
+                   }
+                   ++i; 
+               }
+               else if (pid > 0) 
+               {
+                   if (wait(0) == -1) 
+                   {
+                       perror("wait"); 
+                   }
+               }
+            }           
 		}
 	}
 }
