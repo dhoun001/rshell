@@ -119,9 +119,17 @@ void token(vector< vector<string> > &cmdl)
 		typedef tokenizer< char_separator<char> > tokenizer;
 		char_separator<char> sep(" ");
 		tokenizer tokens(cmdl.at(i).at(0), sep);
+		
+		for (int k = 0; k < cmdl.size(); ++k)
+		{
+			cout << "cmd before pop_back: " << cmdl.at(i).at(0) << endl;
+		}
+
 		cmdl.at(i).pop_back();
+
 		for (tokenizer::iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
 		{
+			cout << "deref iters: " << *iter << endl; 
 			f = *iter;
 			cmdl.at(i).push_back(f);
 			++j;
@@ -133,9 +141,10 @@ void token(vector< vector<string> > &cmdl)
 void startline()
 { 
     char hostname[128];
-    int hostnameStatus = gethostname(hostname, sizeof(hostname)); //passes in an array named hostname & it basically makes a copy of the hostname stored  
-                                                                  //somewhere else and passes it back by reference (default b/c its an array). 
-    if(hostnameStatus == -1) 
+	//passes in an array named hostname & it basically makes a copy of the hostname stored 
+    int hostnameStatus = gethostname(hostname, sizeof(hostname));
+    //somewhere else and passes it back by reference (default b/c its an array). 
+    if (hostnameStatus == -1) 
     {
         perror(hostname);           
     }
@@ -156,7 +165,6 @@ void run()
 		string command;
 		startline(); 
 		getline(cin, command);
-		cout << endl;
 
 		//exit command
 		if (command == "exit")
@@ -169,17 +177,81 @@ void run()
 			vector< vector<string> > cmdline;
 			vector<string> connectors;
 			parseconnect(cmdline, connectors, command);
+			
+			for (int i = 0; i < cmdline.size(); ++i)
+			{
+				cout << "cmd before tokenizing: " << cmdline.at(i).at(0) << endl;
+			}
+
             token(cmdline); 
-            
-           //cmdline.size() add null at very end 
-           pid_t pid = fork(); 
-           sentinel = true; 
-           vector<char*> commandVec; 
-           
-           while(sentinel == true) 
-           {
-                    
-           }       
+            vector< vector<char*> > commands;
+
+			//changes all strings to char pointers
+			for (int i = 0; i < cmdline.size(); ++i)
+			{
+				//cout << cmdline.size() << endl;
+				commands.push_back( vector<char*>() );
+				for (int j = 0; j < cmdline.at(i).size(); ++j)
+				{
+					cout << endl;
+					cout << "before conversion to char*: " << cmdline.at(i).at(j) << endl;
+					cout << "during conversion to char*: " << cmdline.at(i).at(j).c_str() << endl;
+					commands.at(i).push_back(const_cast<char*>(cmdline.at(i).at(j).c_str()));
+				}
+				char* temp = NULL;
+				commands.at(i).push_back(temp);
+			}
+			/*
+			for (int i = 0; i < cmdline.size(); ++i)
+			{
+				for (int j = 0; j < cmdline.at(i).size(); ++j)
+				{
+					cout << cmdline.at(i).at(j) << endl;
+					cout << j << endl;
+				}
+				cout << "--------------------------------------------" << endl;
+			}
+          	*/
+			int i = 0;
+         	bool sentinel = true; 
+          	while (sentinel == true) 
+           	{
+				//checks for connector logic
+				if (i >= connectors.size())
+				{
+					sentinel = false;
+				}
+				else if (connectors.at(i) == ";")
+				{
+					sentinel == true;
+				}
+				//forking process to child
+				pid_t pid = fork();
+				if (pid == 0)
+				{
+					if (execvp(commands.at(i).at(0), &(commands.at(i).at(0))) == -1)
+					{
+						if (connectors.at(i) == "&&")
+						{
+							sentinel == false;
+						}
+						else
+						{
+							sentinel == true;
+						}
+						perror("exec");
+					}
+				}
+				if (pid > 0)
+				{
+					if (wait(0) == -1)
+					{
+						++i;
+						perror("wait");
+					}
+				}
+				++i;
+           	}       
 		}
 	}
 }
@@ -187,7 +259,7 @@ void run()
 //main function, will contain test cases 
 int main()
 {
-	string command = "ls -a && echo asdfkasdfjasdf ; echo asdfjjenenc || aasdfaf";
+	string command = "ls -a ; echo asdfkasdfjasdf ; echo asdfjjenenc || aasdfaf";
 	vector< vector<string> > cmdline;
 	vector<string> connectors;
 	parseconnect(cmdline, connectors, command);
@@ -209,5 +281,7 @@ int main()
 			cout << "<" << cmdline.at(i).at(j) << ">" << endl;
 		}
 	}
+
+	run();
 	return 0;
 }
