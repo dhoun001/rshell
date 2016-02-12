@@ -138,8 +138,12 @@ void run()
 }
 */
 //main function, will contain test cases
+
 int main()
 {
+    int gethostname(char* name, size_t len);
+    int sethostname(const char* name, size_t len); 
+
 	string command = "ls -a && echo asdfkasdfjasdf ; echo asdfjjenenc || aasdfaf";
 	vector< vector<string> > cmdline;
 	vector<string> connectors;
