@@ -19,7 +19,15 @@ void parseconnect(vector< vector<string> > &cmd, vector<string> &connect, string
 	string needfirst = "&&";
 	string needfirstfail = "||";
 	int i = 0;
-	
+	string comment = "#";
+
+	//deleting all comments
+	if (command.find(comment) != string::npos)
+	{
+		int com = command.find(comment);
+		command = command.substr(0, com);
+	}
+
 	//finding connectors
 	while (command.size() != 0)
 	{
@@ -120,13 +128,13 @@ void token(vector< vector<string> > cmdl, vector< vector<string> > &cmdl2)
 		char_separator<char> sep(" ");
 		tokenizer< char_separator<char> > tok(cmdl.at(i).at(0), sep);
 		
-		cout << cmdl.at(i).at(0) << endl;
+		//cout << cmdl.at(i).at(0) << endl;
 		cmdl2.push_back(vector<string>());
 
 		//must seperate vectors or the tokenizer will BREAK
 		for (tokenizer< char_separator<char> >::iterator iter = tok.begin(); iter != tok.end(); ++iter)
 		{
-			cout << "deref iters: " << *iter << endl; 
+			//cout << "deref iters: " << *iter << endl; 
 			f = *iter;
 			cmdl2.at(i).push_back(f);
 			++j;
@@ -176,10 +184,10 @@ void run()
 			vector<string> connectors;
 			parseconnect(cmdline, connectors, command);
 			
-			for (int i = 0; i < cmdline.size(); ++i)
-			{
-				cout << "cmd before tokenizing: " << cmdline.at(i).at(0) << endl;
-			}
+			//for (int i = 0; i < cmdline.size(); ++i)
+			//{
+			//	cout << "cmd before tokenizing: " << cmdline.at(i).at(0) << endl;
+			//}
 			vector< vector<string> > cmdline2;
             token(cmdline, cmdline2); 
             vector< vector<char*> > commands;
@@ -191,71 +199,91 @@ void run()
 				commands.push_back( vector<char*>() );
 				for (int j = 0; j < cmdline2.at(i).size(); ++j)
 				{
-					cout << endl;
-					cout << "before conversion to char*: " << cmdline2.at(i).at(j) << endl;
-					cout << "during conversion to char*: " << cmdline2.at(i).at(j).c_str() << endl;
+					//cout << endl;
+					//cout << "before conversion to char*: " << cmdline2.at(i).at(j) << endl;
+					//cout << "during conversion to char*: " << cmdline2.at(i).at(j).c_str() << endl;
 					commands.at(i).push_back(const_cast<char*>(cmdline2.at(i).at(j).c_str()));
 				}
 				char* temp = NULL;
 				commands.at(i).push_back(temp);
 			}
-			/*
-			for (int i = 0; i < cmdline.size(); ++i)
-			{
-				for (int j = 0; j < cmdline.at(i).size(); ++j)
-				{
-					cout << cmdline.at(i).at(j) << endl;
-					cout << j << endl;
-				}
-				cout << "--------------------------------------------" << endl;
-			}
-          	*/
+
+			//calls process
 			int i = 0;
+			int j = 0;
          	bool sentinel = true; 
           	while (sentinel == true) 
            	{
-				//checks for connector logic
-				if (i >= connectors.size())
+				if (commands.size() == 1)
 				{
+					pid_t pid = fork();
+					if (pid == 0)
+					{
+						if (execvp(commands.at(i).at(0), &(commands.at(i).at(0))) == -1)
+						{
+							perror("exec");
+						}
+					}
+					if (pid > 0)
+					{
+						if (wait(0) == -1)
+						{
+							perror("wait");
+						}
+					}
 					sentinel = false;
 				}
-				else if (connectors.at(i) == ";")
-				{
-					sentinel == true;
-				}
-				//forking process to child
-				pid_t pid = fork();
-				if (pid == 0)
-				{
-					if (execvp(commands.at(i).at(0), &(commands.at(i).at(0))) == -1)
+				else
+				{	
+					if (j == connectors.size())
 					{
-						if (connectors.at(i) == "&&")
+						--j;
+					}
+					//checks for connector logic
+					string temp = commands.at(i).at(0);
+					string tempconnectors = connectors.at(j);
+					if (temp.compare("exit") == 0)
+					{
+						exit(0);
+					}
+					//forking process to child
+					pid_t pid = fork();
+					if (pid == 0)
+					{
+						if (execvp(commands.at(i).at(0), &(commands.at(i).at(0))) == -1)
 						{
-							sentinel = false;
+							if (tempconnectors.compare("&&") == 0)
+							{
+								sentinel = false;
+							}
+							else
+							{
+								sentinel = true;
+							}
+							perror("exec");
 						}
 						else
 						{
-							sentinel == true;
+							if (tempconnectors.compare("||") == 0)
+							{
+								sentinel = false;
+							}
 						}
-						perror("exec");
 					}
-					else
+					if (pid > 0)
 					{
-						if (connectors.at(i) == "||")
+						if (wait(0) == -1)
 						{
-							sentinel = false;
+							perror("wait");
 						}
 					}
-				}
-				if (pid > 0)
-				{
-					if (wait(0) == -1)
+					if (i >= connectors.size())
 					{
-						++i;
-						perror("wait");
+						sentinel = false;
 					}
-				}
-				++i;
+					++i;
+					++j;
+				}			
            	}       
 		}
 	}
@@ -264,6 +292,7 @@ void run()
 //main function, will contain test cases 
 int main()
 {
+/*
 	string command = "ls -a ; echo asdfkasdfjasdf ; echo asdfjjenenc || aasdfaf";
 	vector<string> connectors;
 	vector< vector<string> > cmdline;
@@ -287,7 +316,7 @@ int main()
 			cout << "<" << cmdline2.at(i).at(j) << ">" << endl;
 		}
 	}
-
+*/
 	run();
 	return 0;
 }
