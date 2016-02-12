@@ -114,14 +114,14 @@ void token(vector< vector<string> > &cmdl)
 {
 	string f;
 	for (int i = 0; i < cmdl.size(); ++i)
-	{
+	{ 
 		int j = 0;
 		typedef tokenizer< char_separator<char> > tokenizer;
 		char_separator<char> sep(" ");
 		tokenizer tokens(cmdl.at(i).at(0), sep);
 		cmdl.at(i).pop_back();
 		for (tokenizer::iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
-		{
+		{ 
 			f = *iter;
 			cmdl.at(i).push_back(f);
 			++j;
@@ -157,7 +157,7 @@ void run()
 		startline(); 
 		getline(cin, command);
 		cout << endl;
-
+         
 		//exit command
 		if (command == "exit")
 		{
@@ -170,21 +170,20 @@ void run()
 			vector<string> connectors;
 			parseconnect(cmdline, connectors, command);
             token(cmdline); 
-            vector< vector<char*> > commands; 
-
+            vector< vector<char*> > commands;   
             //changes all strings to char pointers
             for(int i = 0; i < cmdline.size(); i++) 
-           {
+           { 
                commands.push_back(vector<char*>() ); 
-               for(int j = 0; j < cmdline.size(); j++)
+               for(int j = 0; j < cmdline.at(i).size(); j++)
                {
                    commands.at(i).push_back(const_cast<char*>(cmdline.at(i).at(j).c_str()));
                } 
-                char* temp = NULL; 
-                commands.at(i).push_back(const_cast<char*>(temp)); 
+               char* temp = NULL; 
+               commands.at(i).push_back(const_cast<char*>(temp));  
            }
            //cmdline.size() add null at very end 
-
+            
            int i = 0; 
            bool sentinel = true; 
            while(sentinel == true)
@@ -251,6 +250,7 @@ int main()
 		{
 			cout << "<" << cmdline.at(i).at(j) << ">" << endl;
 		}
-	}
+	} 
+    run(); 
 	return 0;
 }
