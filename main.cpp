@@ -128,36 +128,7 @@ void token(vector< vector<string> > &cmdl)
 		}
 	}
 }
-/*
-//main run function, will prepare the command line
-void run()
-{
-	//sentinel for while loop
-	while (true)
-	{
-		//take in a command into a variable
-		string command;
-		cout << "$ ";
-		getline(cin, command);
-		cout << endl;
 
-		//exit command
-		if (command == "exit")
-		{
-			exit(0);
-		}
-		else
-		{
-			//call to parse
-			vector< vector<string> > cmdline;
-			vector<string> connectors;
-			parseconnect(cmdline, connectors, command);
-
-		}
-	}
-}
-*/
-//main function, will contain test cases 
 
 void startline()
 { 
@@ -175,10 +146,47 @@ void startline()
     }   
 }
 
+//main run function, will prepare the command line
+void run()
+{
+	//sentinel for while loop
+	while (true)
+	{
+		//take in a command into a variable
+		string command;
+		startline(); 
+		getline(cin, command);
+		cout << endl;
+
+		//exit command
+		if (command == "exit")
+		{
+			exit(0);
+		}
+		else
+		{
+			//call to parse
+			vector< vector<string> > cmdline;
+			vector<string> connectors;
+			parseconnect(cmdline, connectors, command);
+            token(cmdline); 
+            
+           //cmdline.size() add null at very end 
+           pid_t pid = fork(); 
+           sentinel = true; 
+           vector<char*> commandVec; 
+           
+           while(sentinel == true) 
+           {
+                    
+           }       
+		}
+	}
+}
+
+//main function, will contain test cases 
 int main()
 {
-    startline(); 
-
 	string command = "ls -a && echo asdfkasdfjasdf ; echo asdfjjenenc || aasdfaf";
 	vector< vector<string> > cmdline;
 	vector<string> connectors;
