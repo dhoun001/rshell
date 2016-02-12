@@ -108,6 +108,26 @@ void parseconnect(vector< vector<string> > &cmd, vector<string> &connect, string
 		cmd.push_back(temp);
 	}
 }
+
+//tokenizer function
+void token(vector< vector<string> > &cmdl)
+{
+	string f;
+	for (int i = 0; i < cmdl.size(); ++i)
+	{
+		int j = 0;
+		typedef tokenizer< char_separator<char> > tokenizer;
+		char_separator<char> sep(" ");
+		tokenizer tokens(cmdl.at(i).at(0), sep);
+		cmdl.at(i).pop_back();
+		for (tokenizer::iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
+		{
+			f = *iter;
+			cmdl.at(i).push_back(f);
+			++j;
+		}
+	}
+}
 /*
 //main run function, will prepare the command line
 void run()
@@ -154,5 +174,13 @@ int main()
 		}
 	}
 	cout << cmdline.at(cmdline.size() - 1).at(0) << endl;
+	token(cmdline);
+	for (int i = 0; i < cmdline.size(); ++i)
+	{
+		for (int j = 0; j < cmdline.at(i).size(); ++j)
+		{
+			cout << "<" << cmdline.at(i).at(j) << ">" << endl;
+		}
+	}
 	return 0;
 }
