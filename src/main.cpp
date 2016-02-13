@@ -122,8 +122,9 @@ void parseconnect(vector< vector<string> > &cmd, vector<string> &connect, string
 void token(vector< vector<string> > cmdl, vector< vector<string> > &cmdl2)
 {
 	string f;
-	for (int i = 0; i < cmdl.size(); ++i)
-	{ 
+	int size = cmdl.size();
+	for (int i = 0; i < size; ++i)
+	{
 		int j = 0;
 		char_separator<char> sep(" ");
 		tokenizer< char_separator<char> > tok(cmdl.at(i).at(0), sep);
@@ -193,11 +194,12 @@ void run()
             vector< vector<char*> > commands;
 
 			//changes all strings to char pointers
-			for (int i = 0; i < cmdline2.size(); ++i)
+			int size = cmdline2.size();
+			for (int i = 0; i < size; ++i)
 			{
 				//cout << cmdline.size() << endl;
 				commands.push_back( vector<char*>() );
-				for (int j = 0; j < cmdline2.at(i).size(); ++j)
+				for (unsigned int j = 0; j < cmdline2.at(i).size(); ++j)
 				{
 					//cout << endl;
 					//cout << "before conversion to char*: " << cmdline2.at(i).at(j) << endl;
@@ -209,8 +211,8 @@ void run()
 			}
 
 			//calls process
-			int i = 0;
-			int j = 0;
+			unsigned int i = 0;
+			unsigned int j = 0;
          	bool sentinel = true; 
           	while (sentinel == true) 
            	{
@@ -254,27 +256,53 @@ void run()
 						{
 							if (tempconnectors.compare("&&") == 0)
 							{
-								sentinel = false;
-							}
-							else
-							{
-								sentinel = true;
+								++i;
+								++j;
+								if (i < commands.size())
+								{
+									continue;
+								}
+								//else
+								//{
+								//	sentinel = false;
+								//}
 							}
 							perror("exec");
-						}
-						else
-						{
-							if (tempconnectors.compare("||") == 0)
-							{
-								sentinel = false;
-							}
 						}
 					}
 					if (pid > 0)
 					{
-						if (wait(0) == -1)
+						int stats;
+						if (wait(&stats) == -1)
 						{
 							perror("wait");
+						}
+						else if (WEXITSTATUS(stats) == 0)
+						{
+							if ( (tempconnectors.compare("||") == 0) )
+							{
+								++i;
+								++i;
+								++j;
+								++j;
+								if (j < connectors.size())
+								{
+									tempconnectors = connectors.at(j);
+									if (tempconnectors.compare("||") == 0)
+									{
+										++i;
+										++j;
+									}
+								}
+								if (i >= commands.size())
+								{
+									sentinel = false;
+								}
+								else
+								{
+									continue;
+								}
+							}
 						}
 					}
 					if (i >= connectors.size())
