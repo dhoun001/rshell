@@ -34,7 +34,10 @@
 #testing with symbols: 
     !@$ 
 
-
+#testing with git
+	git status
+	git branch
+	
  
 
 

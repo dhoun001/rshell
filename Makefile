@@ -11,3 +11,4 @@ rshell:
 
 clean:
 	rm -r bin
+
