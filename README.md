@@ -35,3 +35,4 @@ used to test the program functionality.
   * (con) implement || connector logic without this.
 12. Exit works on random occasions, generally works with && but sometimes
   * (con) with || and ; depending on combination
+13. Pressing the enter key as a command will cause the program to abort. 
