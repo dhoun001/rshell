@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <vector>
+#include <stack> 
 
 using namespace std;
 using namespace boost;
@@ -316,6 +317,43 @@ void run()
 		}
 	}
 }
+
+void parser(string command, vector<string> &cmd) 
+{
+    stack<int> parenthesis; 
+    string firstParent = "(";
+    string closeParent = ")";
+    int index = 0;
+    string subCommand = command;    //initialized subCommand to command.  
+
+    if(command.find(firstParent) != string::npos)
+    {
+        while(subCommand.size() != 0 )
+        {
+            //ck if there r things before first parenthesis
+            if(command.find(firstParent) != 0) 
+            {
+                subCommand = command.substr(0, index); 
+                cmd.push_back(subCommand); 
+                command = command.substr(index, command.size() - index); 
+                subCommand = command; 
+            }
+            index = subCommand.find(firstParent); 
+            parenthesis.push(index);  
+            subCommand = subCommand.substr(index + 1, subCommand.size() - index -1);        
+        }
+
+        while(!parenthesis.empty())
+        {
+            if(command.find(closeParent))
+            {
+               subCommand = command.substr(parenthesis.top()+ 1, command.find(closeParent)- 1);
+               parenthesis.pop_back();      
+            }
+        }                           
+    }//end if no firstParent
+
+}//end of parser function
 
 //main function, will contain test cases 
 int main()
