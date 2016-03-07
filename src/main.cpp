@@ -475,50 +475,74 @@ void run()
 		}
 	}
 }
-/*
+
 void parser(string command, vector<string> &cmd) 
 { 
+    vector<int> parenthesis; 
     string firstParent = "(";
     string closeParent = ")";
-    int Index = 0; 
+    int firstIndex = -1; 
+    int secondIndex = -1; 
     int numFirstParent = 0; 
     int numCloseParent = 0;  
     string subCommand = command;    //initialized subCommand to command.  
+    int size = command.size(); 
 
     if(command.find(firstParent) != string::npos)
     {
-       for(int i = 0; i < command.size(); i++)
+       for(unsigned i = 0; i < command.size(); i++)
         {
             if(command.compare(i, 1, firstParent) == 0) 
             {
-                numFirstParent++;   
+                numFirstParent++;
+                parenthesis.push_back(i);    
             } 
             else if(command.compare(i, 1, closeParent) == 0) 
             {
-                numCloseParent++;    
+                numCloseParent++;  
+                parenthesis.push_back(i);  
             }
         }
         if(numFirstParent != numCloseParent)
         {
-            cout << "Error" << endl; 
+            cout << "Error: incorrect numbers of parethensis!" << endl; 
         }
         else
         {
-            for(int i = 0; i < command.size(); i++)
-            {
-            
-            }
-            //ck if there r things before first parenthesis
             if(command.find(firstParent) != 0) 
-            {
-                subCommand = command.substr(0, ); 
-                cmd.push_back(subCommand);  
-            }
+             {
+                secondIndex = command.find(firstParent);
+                subCommand = command.substr(0, secondIndex); 
+                if(secondIndex != 0)
+                   {
+                       cmd.push_back(subCommand);
+                   }
+             }
+             for(unsigned i = 0; i < parenthesis.size()-1; i++)
+             {
+                firstIndex = parenthesis.at(i) + 1;
+                secondIndex = parenthesis.at(i+1) - firstIndex; 
+                subCommand = command.substr(firstIndex, secondIndex);
+                if(secondIndex != 0)
+                   {
+                       cmd.push_back(subCommand);
+                   }
+             }
+             if(parenthesis.at(parenthesis.size()-1) != size -1)
+             {
+                 firstIndex = parenthesis.at(parenthesis.size()-1)+ 1; 
+                 secondIndex = command.size() - firstIndex; 
+                 subCommand = command.substr(firstIndex, secondIndex);
+                 if(secondIndex != 0) 
+                 {
+                     cmd.push_back(subCommand); 
+                 }
+             }
         }           
     }//end if no firstParent
 
 }//end of parser function
-*/
+
 //main function, will contain test cases 
 int main()
 {
