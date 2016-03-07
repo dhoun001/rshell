@@ -323,34 +323,37 @@ void parser(string command, vector<string> &cmd)
     stack<int> parenthesis; 
     string firstParent = "(";
     string closeParent = ")";
-    int index = 0;
+    int topIndex = -1; 
     string subCommand = command;    //initialized subCommand to command.  
 
     if(command.find(firstParent) != string::npos)
     {
-        while(subCommand.size() != 0 )
+        //ck if there r things before first parenthesis
+        if(command.find(firstParent) != 0) 
         {
-            //ck if there r things before first parenthesis
-            if(command.find(firstParent) != 0) 
-            {
-                subCommand = command.substr(0, index); 
-                cmd.push_back(subCommand); 
-                command = command.substr(index, command.size() - index); 
-                subCommand = command; 
-            }
-            index = subCommand.find(firstParent); 
-            parenthesis.push(index);  
-            subCommand = subCommand.substr(index + 1, subCommand.size() - index -1);        
+            subCommand = command.substr(0, index); 
+            cmd.push_back(subCommand);  
         }
-
-        while(!parenthesis.empty())
+        for(int i = 0; i < command.size(); i++)
         {
-            if(command.find(closeParent))
+            if(command.at(i) == firstParent) 
             {
-               subCommand = command.substr(parenthesis.top()+ 1, command.find(closeParent)- 1);
-               parenthesis.pop_back();      
+                parenthesis.push(i); 
+                if(
+            } 
+            if(command.at(i) == closeParent) 
+            {
+                topIndex = parenthesis.top(); 
+                parenthesis.pop();  
+                subCommand = command.substr(topIndex + 1, i - topIndex - 1);
+                cmd.push_back(subCommand);  
             }
-        }                           
+        }
+        if(!parenthesis.empty())
+        {
+            cout << "Error" << endl; 
+        }
+                          
     }//end if no firstParent
 
 }//end of parser function
