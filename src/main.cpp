@@ -319,41 +319,44 @@ void run()
 }
 
 void parser(string command, vector<string> &cmd) 
-{
-    stack<int> parenthesis; 
+{ 
     string firstParent = "(";
     string closeParent = ")";
-    int topIndex = -1; 
+    int Index = 0; 
+    int numFirstParent = 0; 
+    int numCloseParent = 0;  
     string subCommand = command;    //initialized subCommand to command.  
 
     if(command.find(firstParent) != string::npos)
     {
-        //ck if there r things before first parenthesis
-        if(command.find(firstParent) != 0) 
+       for(int i = 0; i < command.size(); i++)
         {
-            subCommand = command.substr(0, index); 
-            cmd.push_back(subCommand);  
-        }
-        for(int i = 0; i < command.size(); i++)
-        {
-            if(command.at(i) == firstParent) 
+            if(command.compare(i, 1, firstParent) == 0) 
             {
-                parenthesis.push(i); 
-                if(
+                numFirstParent++;   
             } 
-            if(command.at(i) == closeParent) 
+            else if(command.compare(i, 1, closeParent) == 0) 
             {
-                topIndex = parenthesis.top(); 
-                parenthesis.pop();  
-                subCommand = command.substr(topIndex + 1, i - topIndex - 1);
-                cmd.push_back(subCommand);  
+                numCloseParent++;    
             }
         }
-        if(!parenthesis.empty())
+        if(numFirstParent != numCloseParent)
         {
             cout << "Error" << endl; 
         }
-                          
+        else
+        {
+            for(int i = 0; i < command.size(); i++)
+            {
+            
+            }
+            //ck if there r things before first parenthesis
+            if(command.find(firstParent) != 0) 
+            {
+                subCommand = command.substr(0, ); 
+                cmd.push_back(subCommand);  
+            }
+        }           
     }//end if no firstParent
 
 }//end of parser function
