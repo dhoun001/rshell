@@ -26,4 +26,14 @@ esad || exit
 ls || exit       *failed 
 
 #testing with one parameter ; exit: 
-ls -a ; exit 
+ls -a ; exit
+
+#testing exit after test
+test -f src ; exit 
+[ -d src ] ; exit 
+
+#testing exit after parenthesis 
+(ls && ls) ; exit 
+(ls || exit) ; echo "hi" 
+(ls && exit) || mkdir this 
+ 
