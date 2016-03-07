@@ -16,3 +16,11 @@
 #testing command then commented command:
     ls #mkdir test 
 
+#testing commented bracket 
+    #[ -f src ]
+
+#testing commented parenthesis 
+    #(ls ; ls) || echo "hi" 
+
+
+
