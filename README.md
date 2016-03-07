@@ -36,3 +36,5 @@ used to test the program functionality.
 12. Exit works on random occasions, generally works with && but sometimes
   * (con) with || and ; depending on combination
 13. Pressing the enter key as a command will cause the program to abort. 
+14. If you use brackets there is a seg fault, but if you use the brackets
+  * within the connectors, then it will go through. 
