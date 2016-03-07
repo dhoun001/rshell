@@ -36,5 +36,9 @@ used to test the program functionality.
 12. Exit works on random occasions, generally works with && but sometimes
   * (con) with || and ; depending on combination
 13. Pressing the enter key as a command will cause the program to abort. 
-14. If you use brackets there is a seg fault, but if you use the brackets
-  * within the connectors, then it will go through. 
+14. The test logic works in most cases, but wont work with [] as a single function.
+15. The [] as a single function creates a segmentation fault.
+16. Also the parenthesis logic may not work with the test logic.
+17. This is a flaw with our logic implementation as we were too late on realizing it.
+18. Additionally, the implementation of the test logic may coincidentally harm the other logic.
+19. This is cuased my a miscommunication between the members.
