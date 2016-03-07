@@ -5,9 +5,11 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdlib.h>
 #include <vector>
 #include <stack> 
+#include <cstring>
 
 using namespace std;
 using namespace boost;
@@ -163,6 +165,113 @@ void startline()
     }   
 }
 
+//-----------------------------------------------------------------------------
+void test_func(vector <char*> to_test)
+{
+	//cout << "detects [] or test" << endl;
+	string e_delim = "-e";
+	char* ed = const_cast<char*>(e_delim.c_str());
+	string f_delim = "-f";
+	char* fd = const_cast<char*>(f_delim.c_str());
+	string d_delim = "-d";
+	char* dd = const_cast<char*>(d_delim.c_str());
+	if (strcmp(to_test.at(1), ed) == 0)
+	{
+		struct stat buffer;
+		//cout << "there we go E" << endl;
+		int statusstat = stat(to_test.at(2), &buffer);
+		//cout << "Status of stat: " << statusstat << endl;
+		if (statusstat == 0)
+		{
+			cout << "(true)" << endl;
+			cout << "Path: Exists." << endl;
+		}
+		else
+		{
+			cout << "(false)" << endl;
+			cout << "Path: Does not exist." << endl;
+		}
+	}
+	else if (strcmp(to_test.at(1), fd) == 0)
+	{
+		//cout << "there we go F" << endl;
+		struct stat buffer;
+		stat(to_test.at(2), &buffer);
+		//cout << "Status of stat: " << statusstat << endl;
+		bool tempbool = S_ISREG(buffer.st_mode);
+		if (tempbool)
+		{
+			cout << "(true)" << endl;
+			cout << "Filename: Is regular file." << endl;
+		}
+		else
+		{
+			cout << "(false)" << endl;
+			cout << "Filename: Is not regular file." << endl;
+		}
+	}
+	else if (strcmp(to_test.at(1), dd) == 0)
+	{
+		//cout << "there we go D" << endl;
+		struct stat buffer;
+		stat(to_test.at(2), &buffer);
+		//cout << "Status of stat: " << statusstat << endl;
+		bool tempbool = S_ISDIR(buffer.st_mode);
+		if (tempbool)
+		{
+			cout << "(true)" << endl;
+			cout << "Filename: Is a directory." << endl;
+		}
+		else
+		{
+			cout << "(false)" << endl;
+			cout << "Filename: Is not a directory." << endl;
+		}
+	}
+	else if (to_test.size() == 2)
+	{
+		//cout << "auto set: E" << endl;
+		struct stat buffer;
+		int statusstat = stat(to_test.at(1), &buffer);
+		//cout << "Status of stat: " << statusstat << endl;
+		if (statusstat == 0)
+		{
+			cout << "(true)" << endl;
+			cout << "Path: Exists." << endl;
+		}
+		else
+		{
+			cout << "(false)" << endl;
+			cout << "Path: Does not exist." << endl;
+		}
+	}
+	else if (to_test.size() == 1)
+	{
+		cout << "Error: invalid use of test" << endl;
+	}
+	else
+	{
+		//cout << "auto set: E" << endl;
+		struct stat buffer;
+		int statusstat = stat(to_test.at(2), &buffer);
+		//cout << "Status of stat: " << statusstat << endl;
+		if (statusstat == 0)
+		{
+			cout << "(true)" << endl;
+			cout << "Path: Exists." << endl;
+		}
+		else
+		{
+			cout << "(false)" << endl;
+			cout << "Path: Does not exist." << endl;
+		}
+	}
+
+
+
+}
+//-------------------------------------------------------------------------------
+
 //main run function, will prepare the command line
 void run()
 {
@@ -193,7 +302,16 @@ void run()
 			vector< vector<string> > cmdline2;
             token(cmdline, cmdline2); 
             vector< vector<char*> > commands;
-
+			//-------------------------------------------------------------------------
+			//changes
+			string test1 = "test";
+			char* test2 = const_cast<char*>(test1.c_str());
+			string test_openb = "[";
+			string test_closedb = "]";
+			char* test3 = const_cast<char*>(test_openb.c_str());
+			char* test4 = const_cast<char*>(test_closedb.c_str());
+			//-------------------------------------------------------------------------
+	
 			//changes all strings to char pointers
 			int size = cmdline2.size();
 			for (int i = 0; i < size; ++i)
@@ -206,6 +324,16 @@ void run()
 					//cout << "before conversion to char*: " << cmdline2.at(i).at(j) << endl;
 					//cout << "during conversion to char*: " << cmdline2.at(i).at(j).c_str() << endl;
 					commands.at(i).push_back(const_cast<char*>(cmdline2.at(i).at(j).c_str()));
+					/*--------------------------------------------------------------------------
+					if (strcmp(commands.at(i).at(0), test2) == 0)
+					{
+						cout << "Hello there!" << " " << commands.at(i).at(0) << endl;
+					}
+					else if (strcmp(commands.at(i).at(0), test3) == 0)
+					{
+						cout << "Hello there!" << " " << commands.at(i).at(0) << endl;
+					}
+					*///-------------------------------------------------------------------------
 				}
 				char* temp = NULL;
 				commands.at(i).push_back(temp);
@@ -217,107 +345,137 @@ void run()
          	bool sentinel = true; 
           	while (sentinel == true) 
            	{
-				if (commands.size() == 1)
+				if (strcmp(commands.at(i).at(0), test3) == 0)
 				{
-					pid_t pid = fork();
-					if (pid == 0)
+					char* tempcharp = commands.at(i).at(commands.at(i).size() - 1);
+					if (strcmp(tempcharp, test4) == 0)
 					{
-						if (execvp(commands.at(i).at(0), &(commands.at(i).at(0))) == -1)
-						{
-							perror("exec");
-						}
-					}
-					if (pid > 0)
-					{
-						if (wait(0) == -1)
-						{
-							perror("wait");
-						}
-					}
-					sentinel = false;
-				}
-				else
-				{	
-					if (j == connectors.size())
-					{
-						--j;
-					}
-					//checks for connector logic
-					string temp = commands.at(i).at(0);
-					string tempconnectors = connectors.at(j);
-					if (temp.compare("exit") == 0)
-					{
-						exit(0);
-					}
-					//forking process to child
-					pid_t pid = fork();
-					if (pid == 0)
-					{
-						if (execvp(commands.at(i).at(0), &(commands.at(i).at(0))) == -1)
-						{
-							if (tempconnectors.compare("&&") == 0)
-							{
-								++i;
-								++j;
-								if (i < commands.size())
-								{
-									continue;
-								}
-								//else
-								//{
-								//	sentinel = false;
-								//}
-							}
-							perror("exec");
-						}
-					}
-					if (pid > 0)
-					{
-						int stats;
-						if (wait(&stats) == -1)
-						{
-							perror("wait");
-						}
-						else if (WEXITSTATUS(stats) == 0)
-						{
-							if ( (tempconnectors.compare("||") == 0) )
-							{
-								++i;
-								++i;
-								++j;
-								++j;
-								if (j < connectors.size())
-								{
-									tempconnectors = connectors.at(j);
-									if (tempconnectors.compare("||") == 0)
-									{
-										++i;
-										++j;
-									}
-								}
-								if (i >= commands.size())
-								{
-									sentinel = false;
-								}
-								else
-								{
-									continue;
-								}
-							}
-						}
-					}
-					if (i >= connectors.size())
-					{
-						sentinel = false;
+						test_func(commands.at(i));
 					}
 					++i;
 					++j;
+					if (i == commands.size())
+					{
+						break;
+					}
+				}
+				else if (strcmp(commands.at(i).at(0), test2) == 0)
+				{
+					test_func(commands.at(i));
+					++i;
+					++j;
+					if (i == commands.size())
+					{
+						break;
+					}
+				}
+				else
+				{
+					if (commands.size() == 1)
+					{
+						pid_t pid = fork();
+						if (pid == 0)
+						{
+							//--------------------------------------------------------------------------
+							int tempexec = execvp(commands.at(i).at(0), &(commands.at(i).at(0)));
+							if (tempexec == -1)
+							{	
+								perror("exec");
+							}
+							//-----------------------
+						}
+						if (pid > 0)
+						{
+							if (wait(0) == -1)
+							{
+								perror("wait");
+							}
+						}
+						sentinel = false;
+					}
+					else
+					{	
+						if (j == connectors.size())
+						{
+							--j;
+						}
+						//checks for connector logic
+						string temp = commands.at(i).at(0);
+						string tempconnectors = connectors.at(j);
+						if (temp.compare("exit") == 0)
+						{
+							exit(0);
+						}
+						//forking process to child
+						pid_t pid = fork();
+						if (pid == 0)
+						{
+							if (execvp(commands.at(i).at(0), &(commands.at(i).at(0))) == -1)
+							{
+								if (tempconnectors.compare("&&") == 0)
+								{
+									++i;
+									++j;
+									if (i < commands.size())
+									{
+										continue;
+									}
+									//else
+									//{
+									//	sentinel = false;
+									//}
+								}
+								perror("exec");
+							}
+						}
+						if (pid > 0)
+						{
+							int stats;
+							if (wait(&stats) == -1)
+							{
+								perror("wait");
+							}
+							else if (WEXITSTATUS(stats) == 0)
+							{
+								if ( (tempconnectors.compare("||") == 0) )
+								{
+									++i;
+									++i;
+									++j;
+									++j;
+									if (j < connectors.size())
+									{
+										tempconnectors = connectors.at(j);
+										if (tempconnectors.compare("||") == 0)
+										{
+											++i;
+											++j;
+										}
+									}
+									if (i >= commands.size())
+									{
+										sentinel = false;
+									}
+									else
+									{
+										continue;
+									}
+								}
+							}
+						}
+						if (i >= connectors.size())
+						{
+							sentinel = false;
+						}
+						++i;
+						++j;
+					}
 				}			
            	}       
 		}
 	}
 }
-
+/*
 void parser(string command, vector<string> &cmd) 
 { 
     string firstParent = "(";
@@ -360,7 +518,7 @@ void parser(string command, vector<string> &cmd)
     }//end if no firstParent
 
 }//end of parser function
-
+*/
 //main function, will contain test cases 
 int main()
 {
